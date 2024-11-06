@@ -1,6 +1,6 @@
 import pygame
 
-from player.HUD import HUD_elements, update_hud_el
+from player.HUD import *
 
 pygame.init() #инициализация
 
@@ -26,7 +26,6 @@ while not stop: #main game loop
             stop = True  # заершение программы
 
     fps = clock.get_fps()
-    #scr.blit(test_image, (0, 0))
 
     #player
     player.movement()
@@ -43,8 +42,14 @@ while not stop: #main game loop
     x0 = 5
     y0 = WINDOW_HEIGHT - 18
     update_hud_el()
+    if fps >= 60:
+        HUD_elements.append(debug_font.render("FPS: " + str(fps), True, green))
+    elif fps >= 30:
+        HUD_elements.append(debug_font.render("FPS: " + str(fps), True, yellow))
+    else:
+        HUD_elements.append(debug_font.render("FPS: " + str(fps), True, red))
     for i in range(len(HUD_elements)):
-        scr.blit(HUD_elements[i], (x0, y0 - i * 12))
+        scr.blit(HUD_elements[i], (x0, y0 - i * 14))
     HUD_elements.clear()
 
     clock.tick(TPS)  #ticks per second

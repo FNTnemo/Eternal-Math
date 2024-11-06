@@ -9,17 +9,18 @@ class Player:
     selected_gun_index = -1
     guns = []
 
-    def __init__(self, x0, y0, velocity):
-        self.player_x = x0 #координаты
-        self.player_y = y0
+    def __init__(self, pos, size, velocity):
+        self.x = pos[0] #координаты
+        self.y = pos[1]
         self.velocity = velocity #скорость игока
+        self.size = size
 
     def movement(self): #перемещение игрока
         keys = pygame.key.get_pressed()
-        if keys[pygame.K_w]: self.player_y -= self.velocity
-        if keys[pygame.K_s]: self.player_y += self.velocity
-        if keys[pygame.K_a]: self.player_x -= self.velocity
-        if keys[pygame.K_d]: self.player_x += self.velocity
+        if keys[pygame.K_w]: self.y -= self.velocity
+        if keys[pygame.K_s]: self.y += self.velocity
+        if keys[pygame.K_a]: self.x -= self.velocity
+        if keys[pygame.K_d]: self.x += self.velocity
 
     def switch_gun(self):
         keys = pygame.key.get_pressed()
@@ -27,8 +28,8 @@ class Player:
         if keys[pygame.K_3] and self.selected_gun_index + 1 < len(self.guns): self.selected_gun_index += 1
 
     def player_draw(self, screen): #отрисовка игрока
-        pygame.draw.rect(screen, white, pygame.Rect(self.player_x, self.player_y, 10, 10))
-        pygame.draw.line(screen, green, (self.player_x, self.player_y), (pygame.mouse.get_pos()), 1)
+        pygame.draw.line(screen, green, (self.x + self.size[0]/2, self.y + self.size[1]/2), (pygame.mouse.get_pos()), 1)
+        pygame.draw.rect(screen, white, pygame.Rect(self.x, self.y, self.size[1], self.size[1]))
 
     def add_gun(self, gun_type_str): #выдать игроку пушку
         for gun_type in gun_types:
@@ -41,16 +42,16 @@ class Player:
         if self.selected_gun_index > -1:
             return self.guns[self.selected_gun_index]
 
-    def calc_player_angle(self): #угол между направлением взгляда и прямой y = player_x
+    def calc_player_angle(self): #угол между направлением взгляда и прямой y = player_x (сложная формула из интернета)
         mouse_pos_x, mouse_pos_y = pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]
-        dx1, dy1 = mouse_pos_x - self.player_x, self.player_y - self.player_y
-        dx2, dy2 = mouse_pos_x - self.player_x, mouse_pos_y - self.player_y
+        dx1, dy1 = mouse_pos_x - self.x, self.y - self.y
+        dx2, dy2 = mouse_pos_x - self.x, mouse_pos_y - self.y
         if dx1 == 0: dx1 = 0.00001
         if dx2 == 0: dx2 = 0.00001
         k1, k2 = dy1/dx1, dy2/dx2
-        if mouse_pos_x >= self.player_x:
+        if mouse_pos_x >= self.x:
             return math.atan(k2 - k1) / (1 + k1 * k2)
         else:
             return -(math.pi - math.atan(k2 - k1) / (1 + k1 * k2))
 
-player = Player(10, 10, 5) #create player
+player = Player((10, 10), (10, 10), 5) #create player
