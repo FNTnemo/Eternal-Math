@@ -1,11 +1,14 @@
 #window
-import pygame.image
-
 WINDOW_WIDTH = 1280
 WINDOW_HEIGHT = 720
+HALF_WINDOW_WIDTH = WINDOW_WIDTH/2
+HALF_WINDOW_HEIGHT = WINDOW_HEIGHT/2
 
 TITLE = "Eternal Math"
 TPS = 60
+
+#map
+sell_size = (64, 64)
 
 #colors
 yellow = (255, 255, 0)

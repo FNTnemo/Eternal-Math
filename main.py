@@ -1,19 +1,28 @@
 import pygame
 
-from player.HUD import *
-
-pygame.init() #инициализация
-
-from player.player import player
-import guns
 from settings import *
 
+pygame.init() #инициализация
 scr = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
+
+from player.camera import camera
+from map import map1, Background
+from player.HUD import *
+from entities.entities import bg1
+from entities.tile import collide_tiles, tiles
+
 clock = pygame.time.Clock()
+
+map1.draw_map()
+tiles.add(Background(0, 0, (1920, 1080), bg1))
+tiles.add(Background(0, 1080, (1920, 1080), bg1))
 
 pygame.display.set_caption(TITLE)
 #pygame.display.set_icon()
 
+#custom cursor
+pygame.mouse.set_visible(False)
+cursor = Cursor(3)
 
 stop = False
 player.add_gun("standard")
@@ -29,14 +38,22 @@ while not stop: #main game loop
 
     #player
     player.movement()
-    player.player_draw(scr)
     player.switch_gun()
     player.get_selected_gun().fire()
     player.get_selected_gun().reload()
+    camera.center_box_camera(player)
 
     #bullets
-    guns.draw_bullets(scr)
     guns.bullets_movement()
+
+    cursor.update_pos()
+
+    #draw
+    draw_queue = [tiles, collide_tiles, enemy_bullets, player_bullets, enemies, player_group]
+    for group in draw_queue:
+        for obj in group:
+            scr.blit(obj.image, (obj.rect.x - camera.offset.x, obj.rect.y - camera.offset.y))
+    scr.blit(cursor.image, (cursor.rect.x - cursor.img_size[0]*1.5, cursor.rect.y - cursor.img_size[1]*1.5))
 
     #HUD
     x0 = 5
