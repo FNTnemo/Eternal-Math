@@ -1,72 +1,90 @@
 import pygame
-
 from settings import *
 
 pygame.init() #инициализация
 scr = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
-
-from player.camera import camera
-from map import map1, Background
-from player.HUD import *
-from entities.entities import bg1
-from entities.tile import collide_tiles, tiles
-
 clock = pygame.time.Clock()
-
-map1.draw_map()
-tiles.add(Background(0, 0, (1920, 1080), bg1))
-tiles.add(Background(0, 1080, (1920, 1080), bg1))
-
 pygame.display.set_caption(TITLE)
 #pygame.display.set_icon()
 
-#custom cursor
 pygame.mouse.set_visible(False)
-cursor = Cursor(3)
+
+from guns import all_projectiles
+from entities.enemy import spawn_enemy
+from player.player import player
+from player.camera import camera
+from map import Background, load_map, loaded_map, m0_0, m0_1
+from player.HUD import cursor, debug_font, debug_elements, update_debug_el, HUD_elements, HUD_element, \
+    update_HUD_element
+from entities.entities import bg1, enemy_bullets_group, player_bullets_group, enemies_group, player_group
+from entities.tile import collide_tiles, tiles, clear_tiles
 
 stop = False
-player.add_gun("standard")
+load_map(m0_1)
+#loaded_map.draw_map()
+
+for element in range(-(int(-loaded_map.get_map_size()[1] // bg1.get_size()[1]))): #background draw
+    tiles.add(Background(0, element * 1080, (1920, 1080), bg1))
+
+player.add_gun("standard") #player guns
 player.add_gun("laser")
 
+spawn_enemy("standard", (100, 400)) #enemy spawn
+
 while not stop: #main game loop
-    scr.fill((0, 0, 0))  # заливка экрана
+    scr.fill((0, 0, 0))  # screen fill
     for event in pygame.event.get():
         if event.type == pygame.QUIT or pygame.key.get_pressed()[pygame.K_ESCAPE]:
-            stop = True  # заершение программы
+            stop = True  # game ending
 
     fps = clock.get_fps()
 
     #player
-    player.movement()
-    player.switch_gun()
-    player.get_selected_gun().fire()
-    player.get_selected_gun().reload()
+    player.update()
     camera.center_box_camera(player)
+    #player.player_angle_debug_draw(scr)
+    #camera.camera_shake(10, 10)
 
-    #bullets
-    guns.bullets_movement()
+    #enemy
+    for enemy in enemies_group:
+        enemy.update()
+
+    #bullets movement
+    for bullet in all_projectiles:
+        bullet.movement()
 
     cursor.update_pos()
 
+    if pygame.key.get_pressed() == pygame.K_c:
+        load_map(m0_1)
+    if pygame.key.get_pressed() == pygame.K_z:
+        load_map(m0_0)
+
     #draw
-    draw_queue = [tiles, collide_tiles, enemy_bullets, player_bullets, enemies, player_group]
+    draw_queue = [tiles, collide_tiles, enemy_bullets_group, player_bullets_group, enemies_group, player_group]
     for group in draw_queue:
         for obj in group:
             scr.blit(obj.image, (obj.rect.x - camera.offset.x, obj.rect.y - camera.offset.y))
-    scr.blit(cursor.image, (cursor.rect.x - cursor.img_size[0]*1.5, cursor.rect.y - cursor.img_size[1]*1.5))
+            #pygame.draw.rect(scr, "red", obj.rect)
+    scr.blit(cursor.image, (cursor.rect.x, cursor.rect.y))
 
     #HUD
     x0 = 5
     y0 = WINDOW_HEIGHT - 18
-    update_hud_el()
+    update_debug_el()
     if fps >= 60:
-        HUD_elements.append(debug_font.render("FPS: " + str(fps), True, green))
+        debug_elements.append(debug_font.render("FPS: " + str(fps), True, green))
     elif fps >= 30:
-        HUD_elements.append(debug_font.render("FPS: " + str(fps), True, yellow))
+        debug_elements.append(debug_font.render("FPS: " + str(fps), True, yellow))
     else:
-        HUD_elements.append(debug_font.render("FPS: " + str(fps), True, red))
-    for i in range(len(HUD_elements)):
-        scr.blit(HUD_elements[i], (x0, y0 - i * 14))
+        debug_elements.append(debug_font.render("FPS: " + str(fps), True, red))
+
+    for element in range(len(debug_elements)):
+        scr.blit(debug_elements[element], (x0, y0 - element * 14))
+    for element in HUD_elements:
+        element.draw(scr)
+        update_HUD_element(element)
+    debug_elements.clear()
     HUD_elements.clear()
 
     clock.tick(TPS)  #ticks per second

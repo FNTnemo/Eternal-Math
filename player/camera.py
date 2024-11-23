@@ -1,7 +1,7 @@
 import pygame.display
 
-from settings import HALF_WINDOW_WIDTH, HALF_WINDOW_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT
-from map import map1
+from map import loaded_map
+from settings import *
 
 
 #       \_______/
@@ -19,13 +19,16 @@ class Camera:
     def __init__(self):
         self.display_serf = pygame.display.get_surface()
         self.offset = pygame.math.Vector2()
-        self.camera_box_borders = {"left": 600, "right": 600, "top": 300, "bottom": 300}
+        self.camera_box_borders = {"left": 500, "right": 500, "top": 200, "bottom": 200}
 
         self.left = self.camera_box_borders["left"]
         self.top = self.camera_box_borders["top"]
         self.width = WINDOW_WIDTH - (self.camera_box_borders["left"] + self.camera_box_borders["right"])
         self.height = WINDOW_HEIGHT - (self.camera_box_borders["top"]  + self.camera_box_borders["bottom"])
         self.camera_box_rect = pygame.Rect(self.left, self.top, self.width, self.height)
+
+        #camera shake
+        self.camera_shake_offset = pygame.math.Vector2
 
     def center_camera(self, target):
         self.offset.x = target.rect.center[0] - HALF_WINDOW_WIDTH
@@ -41,9 +44,12 @@ class Camera:
         if target.rect.bottom > self.camera_box_rect.bottom:
             self.camera_box_rect.bottom = target.rect.bottom
 
-        if self.camera_box_rect.right + self.left <= map1.get_map_size()[0] + 2:
+        if self.camera_box_rect.right + self.left <= loaded_map.get_map_size()[0] + 2:
             self.offset.x = max(0, self.camera_box_rect.left - self.camera_box_borders["left"])
-        if self.camera_box_rect.bottom + self.top <= map1.get_map_size()[1] + 2:
+        if self.camera_box_rect.bottom + self.top <= loaded_map.get_map_size()[1] + 2:
             self.offset.y = max(0, self.camera_box_rect.top - self.camera_box_borders["top"])
+
+    def camera_shake(self, max_offset_x, max_offset_y):
+        self.camera_shake_offset.x += 1
 
 camera = Camera()
