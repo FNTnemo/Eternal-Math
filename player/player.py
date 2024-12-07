@@ -101,9 +101,6 @@ class Player(pygame.sprite.Sprite):
         for sprite in group:
             if self.rect.colliderect(sprite):
                 return True
-        #for sprite in group:
-        #    if (sprite.rect.collidepoint(self.rect.x, self.rect.y) or self.rect.left == sprite.rect.right or self.rect.right == sprite.rect.left) and self.rect.colliderect(sprite):
-        #        return True
 
     #anim
     def animation(self):

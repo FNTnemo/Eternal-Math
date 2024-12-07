@@ -50,6 +50,7 @@ class Enemy(pygame.sprite.Sprite):
         for sprite in group:
             if self.rect.colliderect(sprite):
                 return True
+        return False
 
     def movement(self):
         angle = self.calc_angle()
