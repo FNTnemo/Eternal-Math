@@ -2,7 +2,6 @@
 import random
 
 import pygame.draw
-from pygame.examples.cursors import image
 
 from settings import *
 from entities.entities import wall_tile_test, stone_wall_images
@@ -14,7 +13,7 @@ class Background(pygame.sprite.Sprite):
         sell_size_k_x = size[0] / img.get_size()[0]
         sell_size_k_y = size[1] / img.get_size()[1]
         self.image = pygame.transform.scale(img.convert_alpha(), (img.get_size()[0] * sell_size_k_x, img.get_size()[1] * sell_size_k_y))
-        self.rect = image.get_rect(topleft=(x, y))
+        self.rect = self.image.get_rect(topleft=(x, y))
 
 #chapter 0
 m0_0 = [[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
