@@ -163,4 +163,4 @@ class Player(pygame.sprite.Sprite):
         else:
             return -(math.pi - math.atan(rad))
 
-player = Player(10,(200 * scale_x, 300 * scale_y), 0.4 * scale_x, 5 * scale_x, player_group) #create player
+player = Player(10,(200 * scale_x, 300 * scale_y), 0.38 * scale_x, 5 * scale_x, player_group) #create player

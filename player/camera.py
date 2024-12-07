@@ -1,6 +1,6 @@
 import pygame.display
 
-from map import loaded_map
+from map import loaded_map, get_map_size
 from settings import *
 
 
@@ -44,9 +44,9 @@ class Camera:
         if target.rect.bottom > self.camera_box_rect.bottom:
             self.camera_box_rect.bottom = target.rect.bottom
 
-        if self.camera_box_rect.right + self.left <= loaded_map.get_map_size()[0] + 2:
+        if self.camera_box_rect.right + self.left <= get_map_size(loaded_map)[0] + 2:
             self.offset.x = max(0, self.camera_box_rect.left - self.camera_box_borders["left"])
-        if self.camera_box_rect.bottom + self.top <= loaded_map.get_map_size()[1] + 2:
+        if self.camera_box_rect.bottom + self.top <= get_map_size(loaded_map)[1] + 2:
             self.offset.y = max(0, self.camera_box_rect.top - self.camera_box_borders["top"])
 
     def camera_shake(self, max_offset_x, max_offset_y):

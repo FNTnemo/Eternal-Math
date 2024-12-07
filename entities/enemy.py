@@ -3,16 +3,18 @@ import math
 import pygame.sprite
 from pygame.examples.cursors import image
 
-from entities.entities import enemies_group, player_stay_img, player_group
+from entities.entities import enemies_group, player_stay_img, player_group, plus_enemy_stay_image, \
+    minus_enemy_stay_image
 from entities.tile import collide_tiles
 from guns import all_projectiles
 from player.camera import camera
 from player.player import player
 
 # тип, скорость, хп, пушка
-enemy_types = {"standard": ["standard", 3, 10]}
+enemy_types = {"plus": ["plus", plus_enemy_stay_image, 2, 10],
+               "minus": ["minus", minus_enemy_stay_image, 4, 6]}
 
-scale = 0.3
+scale = 0.15
 
 def spawn_enemy(type_str, pos):
     return Enemy(enemy_types[type_str], pos)
@@ -20,14 +22,14 @@ def spawn_enemy(type_str, pos):
 class Enemy(pygame.sprite.Sprite):
     def __init__(self, enemy_type, pos):
         super().__init__(enemies_group)
-        source_image = player_stay_img.convert_alpha()
+        source_image = enemy_type[1].convert_alpha()
         w, h = source_image.get_size()
         self.image = pygame.transform.scale(source_image, (w * scale, h * scale))
         self.rect = self.image.get_rect(topleft=(pos[0], pos[1]))
 
         self.type = enemy_type[0]
-        self.velocity_length = enemy_type[1]
-        self.hp = enemy_type[2]
+        self.velocity_length = enemy_type[2]
+        self.hp = enemy_type[3]
 
         self.velocity = pygame.math.Vector2()
 
@@ -37,6 +39,8 @@ class Enemy(pygame.sprite.Sprite):
     def update(self):
         self.movement()
         self.animation()
+        if self.hp <= 0:
+            self.death()
         for projectile in all_projectiles:
             if self.rect.colliderect(projectile.rect):
                 self.get_damage(projectile.damage)
@@ -60,6 +64,9 @@ class Enemy(pygame.sprite.Sprite):
 
     def get_damage(self, damage):
         self.hp -= damage
+
+    def death(self):
+        enemies_group.remove(self)
 
     #animation
     def animation(self):

@@ -13,7 +13,7 @@ from guns import all_projectiles
 from entities.enemy import spawn_enemy
 from player.player import player
 from player.camera import camera
-from map import Background, load_map, loaded_map, m0_0, m0_1
+from map import Background, load_map, loaded_map, m0_0, m0_1, get_map_size
 from player.HUD import cursor, debug_font, debug_elements, update_debug_el, HUD_elements, HUD_element, \
     update_HUD_element
 from entities.entities import bg1, enemy_bullets_group, player_bullets_group, enemies_group, player_group
@@ -23,13 +23,14 @@ stop = False
 load_map(m0_1)
 #loaded_map.draw_map()
 
-for element in range(-(int(-loaded_map.get_map_size()[1] // bg1.get_size()[1]))): #background draw
+for element in range(-(int(-get_map_size(loaded_map)[1] // bg1.get_size()[1]))): #background draw
     tiles.add(Background(0, element * 1080, (1920, 1080), bg1))
 
 player.add_gun("standard") #player guns
 player.add_gun("laser")
 
-spawn_enemy("standard", (100, 400)) #enemy spawn
+spawn_enemy("plus", (100, 400)) #enemy spawn
+spawn_enemy("minus", (700, 200))
 
 while not stop: #main game loop
     scr.fill((0, 0, 0))  # screen fill

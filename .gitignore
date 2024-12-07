@@ -2,3 +2,8 @@
 __pycache__/
 player/__pycache__/
 main.spec
+.DS_Store
+images/blocks/.DS_Store
+images/guns/.DS_Store
+images/guns/bullets/.DS_Store
+images/.DS_Store
