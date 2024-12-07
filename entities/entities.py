@@ -1,8 +1,4 @@
-import os.path
-
 import pygame
-
-from settings import resource_path
 
 #import images
 bg1 = pygame.image.load("images/bg1.jpg")

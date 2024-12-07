@@ -1,7 +1,4 @@
-from ctypes import PyDLL
-
 import pygame
-from pygame.examples.cursors import image
 
 import guns
 from player.player import player

@@ -1,7 +1,6 @@
 import math
 
 import pygame.sprite
-from pygame.examples.cursors import image
 
 from entities.entities import enemies_group, player_stay_img, player_group, plus_enemy_stay_image, \
     minus_enemy_stay_image
