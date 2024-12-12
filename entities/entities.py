@@ -18,19 +18,19 @@ cursor_img = pygame.image.load("images/cursor.png")
 #guns
 
 #bullets
+standard_bullet_image = pygame.image.load("images/guns/bullets/bullet.png")
 def get_bullet_img(gun_type):
-    return pygame.image.load(f"images/guns/bullets/bullet_{gun_type}_test.png" )
+    #return pygame.image.load(f"images/guns/bullets/bullet_{gun_type}_test.png" )
+    return standard_bullet_image
 
 #enemies
 plus_enemy_stay_image = pygame.image.load("images/enemies/plus_vrug.png")
 minus_enemy_stay_image = pygame.image.load("images/enemies/SU-shi_vrag.png")
 
-
-def collision(obj, group2):
-    for obj2 in group2:
-        if obj.rect.colliderect(obj2.rect):
-            return True, obj.rect.colliderect(obj2.rect)
-    return False
+#hud
+half_heat = pygame.image.load("images/UI/half_heart.png").convert_alpha()
+full_heat = pygame.image.load("images/UI/full_heart.png").convert_alpha()
+math_menu_image = pygame.image.load("images/UI/math_menu.png").convert_alpha()
 
 player_group = pygame.sprite.Group()
 enemies_group = pygame.sprite.Group()

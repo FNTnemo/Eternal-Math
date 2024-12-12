@@ -5,7 +5,7 @@ pygame.init() #инициализация
 scr = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 clock = pygame.time.Clock()
 pygame.display.set_caption(TITLE)
-#pygame.display.set_icon()
+pygame.display.set_icon(pygame.image.load("images/UI/LOGO.ico"))
 
 pygame.mouse.set_visible(False)
 
@@ -14,10 +14,10 @@ from entities.enemy import spawn_enemy
 from player.player import player
 from player.camera import camera
 from map import Background, load_map, loaded_map, m0_0, m0_1, get_map_size
-from player.HUD import cursor, debug_font, debug_elements, update_debug_el, HUD_elements, HUD_element, \
-    update_HUD_element
+from player.HUD import cursor, debug_font, debug_elements, update_debug_el, HUD_elements, \
+    update_HUD_elements
 from entities.entities import bg1, enemy_bullets_group, player_bullets_group, enemies_group, player_group
-from entities.tile import collide_tiles, tiles, clear_tiles
+from entities.tile import collide_tiles, tiles
 
 stop = False
 load_map(m0_1)
@@ -35,11 +35,10 @@ spawn_enemy("minus", (700, 200))
 while not stop: #main game loop
     scr.fill((0, 0, 0))  # screen fill
     for event in pygame.event.get():
-        if event.type == pygame.QUIT or pygame.key.get_pressed()[pygame.K_ESCAPE]:
+        if event.type == pygame.QUIT:
             stop = True  # game ending
 
     fps = clock.get_fps()
-
     #player
     player.update()
     camera.center_box_camera(player)
@@ -72,6 +71,7 @@ while not stop: #main game loop
     #HUD
     x0 = 5
     y0 = WINDOW_HEIGHT - 18
+    update_HUD_elements()
     update_debug_el()
     if fps >= 60:
         debug_elements.append(debug_font.render("FPS: " + str(fps), True, green))
@@ -83,8 +83,7 @@ while not stop: #main game loop
     for element in range(len(debug_elements)):
         scr.blit(debug_elements[element], (x0, y0 - element * 14))
     for element in HUD_elements:
-        element.draw(scr)
-        update_HUD_element(element)
+        scr.blit(element.image, (element.rect.x, element.rect.y))
     debug_elements.clear()
     HUD_elements.clear()
 

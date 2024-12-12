@@ -6,7 +6,7 @@ from entities.tile import collide_tiles
 from guns import gun_types
 from player.camera import camera
 from settings import *
-from entities.entities import player_stay_img, player_walking_images, collision
+from entities.entities import player_stay_img, player_walking_images
 from entities.entities import player_group
 
 class Player(pygame.sprite.Sprite):
@@ -36,6 +36,9 @@ class Player(pygame.sprite.Sprite):
         self.selected_gun_index = -1
 
         self.hp = 10
+        self.alive = True
+        self.hp_cooldown_start = 90
+        self.hp_cooldown = self.hp_cooldown_start
 
         #anim
         #sprites
@@ -46,14 +49,21 @@ class Player(pygame.sprite.Sprite):
         self.frame = 0
         self.last_update = pygame.time.get_ticks()
 
+        #booleans
         self.is_flip = False
+        self.math_menu = False
 
     def update(self):
-        self.animation()
-        self.movement()
-        self.switch_gun()
-        self.get_selected_gun().fire()
-        self.get_selected_gun().reload()
+        if self.alive:
+            self.animation()
+            self.movement()
+            self.switch_gun()
+            self.get_selected_gun().fire()
+            self.get_selected_gun().reload()
+        if self.hp <= 0:
+            self.remove(player_group)
+            self.alive = False
+
 
     #movement
     def movement(self): #перемещение игрока
@@ -131,13 +141,17 @@ class Player(pygame.sprite.Sprite):
     def add_gun(self, gun_type_str): #выдать игроку пушку
         for gun_type in gun_types:
             if gun_type == gun_type_str:
-                new_gun = guns.Gun(gun_types[gun_type], "player")
+                new_gun = guns.Gun(gun_types[gun_type], self)
                 self.guns.append(new_gun)
                 self.selected_gun_index += 1
                 break
 
     def get_damage(self, damage):
-        self.hp -= damage
+        if self.hp_cooldown <= 0:
+            self.hp -= damage
+            self.hp_cooldown = self.hp_cooldown_start
+        else:
+            self.hp_cooldown -= 1
 
     def player_angle_debug_draw(self, screen): #отрисовка игрока
         pygame.draw.line(screen, green, (self.rect.center[0] - camera.offset.x, self.rect.center[1] - camera.offset.y), (pygame.mouse.get_pos()), 1) #линия от игрока до мышки
@@ -146,7 +160,7 @@ class Player(pygame.sprite.Sprite):
         if self.selected_gun_index > -1:
             return self.guns[self.selected_gun_index]
 
-    def calc_player_angle(self): #угол между направлением взгляда и прямой y = player_x (сложная формула из интернета)
+    def calc_angle(self): #угол между направлением взгляда и прямой y = player_x (сложная формула из интернета)
         from player.HUD import cursor
         mouse_pos_x, mouse_pos_y = cursor.rect.center
         dx1, dy1 = mouse_pos_x - (self.rect.center[0] - camera.offset.x), 0

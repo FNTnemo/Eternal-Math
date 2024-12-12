@@ -29,6 +29,7 @@ class Enemy(pygame.sprite.Sprite):
         self.type = enemy_type[0]
         self.velocity_length = enemy_type[2]
         self.hp = enemy_type[3]
+        self.damage = 1
 
         self.velocity = pygame.math.Vector2()
 
@@ -36,35 +37,44 @@ class Enemy(pygame.sprite.Sprite):
         self.is_flip = False
 
     def update(self):
-        self.movement()
-        self.animation()
-        if self.hp <= 0:
-            self.death()
-        for projectile in all_projectiles:
-            if self.rect.colliderect(projectile.rect):
-                self.get_damage(projectile.damage)
-                projectile.remove()
+        if player.alive:
+            if player.rect.colliderect(self.rect):
+                player.get_damage(self.damage)
+            self.movement()
+            self.animation()
+            if self.hp <= 0:
+                self.death()
+            for projectile in all_projectiles:
+                if self.rect.colliderect(projectile.rect):
+                    self.get_damage(projectile.damage)
+                    projectile.remove()
+
+            #if self.type == "minus":
+
 
     def is_collide(self, group):
         for sprite in group:
-            if self.rect.colliderect(sprite):
+            new_rect = pygame.Rect(self.rect.x + self.velocity.x, self.rect.y + self.velocity.y,
+                                   self.image.get_size()[0], self.image.get_size()[1])
+            if new_rect.colliderect(sprite):
                 return True
+        if player.rect.colliderect(self.rect): return True
         return False
 
     def movement(self):
         angle = self.calc_angle()
         self.velocity.x = self.velocity_length * math.cos(angle)
         self.velocity.y = self.velocity_length * math.sin(angle)
+        r = ((self.rect.x - player.rect.x)**2 + (self.rect.y - player.rect.y)**2) ** 0.5
+        print(r)
+        if self.type == "plus" and r <= 250:
+            return
         if not self.is_collide(collide_tiles):
             self.rect.x += self.velocity.x
             self.rect.y += self.velocity.y
-        else:
-            self.rect.x -= self.velocity.x
-            self.rect.y -= self.velocity.y
 
     def get_damage(self, damage):
         self.hp -= damage
-
     def death(self):
         enemies_group.remove(self)
 

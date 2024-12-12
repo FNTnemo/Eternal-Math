@@ -45,7 +45,7 @@ class Gun():
         if self.ammo_delay <= 0:
             if (keys[pygame.K_SPACE] or buttons[0]) and self.reload_delay <= 0 < self.ammo and (self.can_shot or self.rate_of_fire):
                 from player.player import player
-                angle = player.calc_player_angle()
+                angle = player.calc_angle()
                 new_bullet = Projectile(self.bullet_type, (player.rect.center[0], player.rect.center[1]),
                                         (self.bullet_type[2] * math.cos(angle), self.bullet_type[2] * math.sin(angle)),self.user)
                 all_projectiles.append(new_bullet)
@@ -64,7 +64,7 @@ class Projectile(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
         self.type = type[0]  # тип оружия = тип пули
         img = get_bullet_img(self.type).convert_alpha() #стандартная картинка
-        self.image = pygame.transform.scale(img, (img.get_size()[0] * 8, img.get_size()[1] * 8))   # увеличеная картинка пули
+        self.image = pygame.transform.rotate(pygame.transform.scale(img, (img.get_size()[0] * 0.25, img.get_size()[1] * 0.25)), 180 - math.degrees(sender.calc_angle()))    # увеличеная картинка пули
         self.rect = self.image.get_rect(center=(pos[0], pos[1])) #поверхность для картинки
 
         self.damage = type[1] #тип пули = тип оружия
