@@ -2,10 +2,12 @@ import math
 
 import pygame.sprite
 
+import guns
 from entities.entities import enemies_group, player_stay_img, player_group, plus_enemy_stay_image, \
-    minus_enemy_stay_image
+    minus_enemy_stay_image, player_projectile_group
 from entities.tile import collide_tiles
-from guns import all_projectiles
+from guns import all_projectiles, gun_types, all_guns
+from map import get_map_cell
 from player.camera import camera
 from player.player import player
 
@@ -32,19 +34,36 @@ class Enemy(pygame.sprite.Sprite):
         self.damage = 1
 
         self.velocity = pygame.math.Vector2()
+        if self.type == "plus":
+            self.add_gun("standard")
+        else:
+            self.gun = "empty"
 
         #booleans
         self.is_flip = False
+        self.in_attack_radius = False
+
+    def add_gun(self, gun_type_str): #выдать игроку пушку
+        for gun_type in gun_types:
+            if gun_type == gun_type_str:
+                new_gun = guns.Gun(gun_types[gun_type], self)
+                all_guns.append(new_gun)
+                self.gun = new_gun
 
     def update(self):
         if player.alive:
+            if self.gun != "empty":
+                if self.in_attack_radius:
+                    self.gun.fire()
+                if self.gun.ammo <= 0:
+                    self.gun.reload()
             if player.rect.colliderect(self.rect):
                 player.get_damage(self.damage)
             self.movement()
             self.animation()
             if self.hp <= 0:
                 self.death()
-            for projectile in all_projectiles:
+            for projectile in player_projectile_group:
                 if self.rect.colliderect(projectile.rect):
                     self.get_damage(projectile.damage)
                     projectile.remove()
@@ -66,9 +85,11 @@ class Enemy(pygame.sprite.Sprite):
         self.velocity.x = self.velocity_length * math.cos(angle)
         self.velocity.y = self.velocity_length * math.sin(angle)
         r = ((self.rect.x - player.rect.x)**2 + (self.rect.y - player.rect.y)**2) ** 0.5
-        print(r)
         if self.type == "plus" and r <= 250:
+            self.in_attack_radius = True
             return
+        else:
+            self.in_attack_radius = False
         if not self.is_collide(collide_tiles):
             self.rect.x += self.velocity.x
             self.rect.y += self.velocity.y
@@ -77,6 +98,8 @@ class Enemy(pygame.sprite.Sprite):
         self.hp -= damage
     def death(self):
         enemies_group.remove(self)
+        if self.gun != "empty":
+            all_guns.remove(self.gun)
 
     #animation
     def animation(self):
@@ -105,3 +128,6 @@ class Enemy(pygame.sprite.Sprite):
             return math.atan(rad)
         else:
             return -(math.pi - math.atan(rad))
+
+def find_path(start_pos, end_pos):
+    pass

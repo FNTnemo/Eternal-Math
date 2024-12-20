@@ -6,7 +6,7 @@ from entities.tile import collide_tiles
 from guns import gun_types
 from player.camera import camera
 from settings import *
-from entities.entities import player_stay_img, player_walking_images
+from entities.entities import player_stay_img, player_walking_images, enemy_projectile_group
 from entities.entities import player_group
 
 class Player(pygame.sprite.Sprite):
@@ -35,7 +35,8 @@ class Player(pygame.sprite.Sprite):
         self.guns = []
         self.selected_gun_index = -1
 
-        self.hp = 10
+        self.max_hp = hp
+        self.hp = self.max_hp
         self.alive = True
         self.hp_cooldown_start = 90
         self.hp_cooldown = self.hp_cooldown_start
@@ -60,6 +61,9 @@ class Player(pygame.sprite.Sprite):
             self.switch_gun()
             self.get_selected_gun().fire()
             self.get_selected_gun().reload()
+            for projectile in enemy_projectile_group:
+                if projectile.rect.colliderect(self.rect):
+                    self.get_damage(projectile.damage)
         if self.hp <= 0:
             self.remove(player_group)
             self.alive = False

@@ -9,14 +9,15 @@ pygame.display.set_icon(pygame.image.load("images/UI/LOGO.ico"))
 
 pygame.mouse.set_visible(False)
 
-from guns import all_projectiles
+from guns import all_projectiles, all_guns
 from entities.enemy import spawn_enemy
 from player.player import player
 from player.camera import camera
 from map import Background, load_map, loaded_map, m0_0, m0_1, get_map_size
 from player.HUD import cursor, debug_font, debug_elements, update_debug_el, HUD_elements, \
     update_HUD_elements
-from entities.entities import bg1, enemy_bullets_group, player_bullets_group, enemies_group, player_group
+from entities.entities import bg1, enemy_projectile_group, player_projectile_group, enemies_group, player_group, \
+    item_group
 from entities.tile import collide_tiles, tiles
 
 stop = False
@@ -32,6 +33,7 @@ player.add_gun("laser")
 spawn_enemy("plus", (100, 400)) #enemy spawn
 spawn_enemy("minus", (700, 200))
 
+
 while not stop: #main game loop
     scr.fill((0, 0, 0))  # screen fill
     for event in pygame.event.get():
@@ -45,23 +47,28 @@ while not stop: #main game loop
     #player.player_angle_debug_draw(scr)
     #camera.camera_shake(10, 10)
 
-    #enemy
-    for enemy in enemies_group:
-        enemy.update()
+    if player.alive:
+        #enemy
+        for enemy in enemies_group:
+            enemy.update()
 
-    #bullets movement
-    for bullet in all_projectiles:
-        bullet.movement()
+        #guns
+        for gun in all_guns:
+            gun.update()
+        player.get_selected_gun().update()
 
+        #bullets movement
+        for projectile in all_projectiles:
+            projectile.movement()
+
+        #item
+        for item in item_group:
+            item.update()
     cursor.update_pos()
 
-    if pygame.key.get_pressed() == pygame.K_c:
-        load_map(m0_1)
-    if pygame.key.get_pressed() == pygame.K_z:
-        load_map(m0_0)
-
     #draw
-    draw_queue = [tiles, collide_tiles, enemy_bullets_group, player_bullets_group, enemies_group, player_group]
+    print(len(all_guns))
+    draw_queue = [tiles, collide_tiles, item_group, enemy_projectile_group, player_projectile_group, enemies_group, player_group, all_guns, [player.get_selected_gun()]]
     for group in draw_queue:
         for obj in group:
             scr.blit(obj.image, (obj.rect.x - camera.offset.x, obj.rect.y - camera.offset.y))

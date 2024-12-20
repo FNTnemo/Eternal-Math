@@ -3,7 +3,7 @@ import pygame
 import guns
 from player.player import player
 from settings import *
-from entities.entities import player_group, player_bullets_group, enemy_bullets_group, enemies_group, cursor_img, \
+from entities.entities import player_group, player_projectile_group, enemy_projectile_group, enemies_group, cursor_img, \
     half_heat, full_heat, math_menu_image
 from entities.tile import tiles, collide_tiles, Tile
 
@@ -21,7 +21,7 @@ def update_debug_el():
     debug_elements.append(debug_font.render("selected_gun: " + str(player.get_selected_gun().type), True, black))
     debug_elements.append(debug_font.render(f"number_of_existing_bullets: {len(guns.all_projectiles)}", True, black))
     debug_elements.append(debug_font.render(f"number_of_existing_objects: "
-                                          f"{len(enemy_bullets_group) + len(player_bullets_group) + len(enemies_group) + len(player_group) +
+                                          f"{len(enemy_projectile_group) + len(player_projectile_group) + len(enemies_group) + len(player_group) +
                                              len(tiles) + len(collide_tiles)}", True, black))
     debug_elements.append(debug_font.render("player_hp: " + str(player.hp), True, black))
 

@@ -3,19 +3,23 @@ import pygame
 
 from entities.tile import collide_tiles
 from player.camera import camera
-from entities.entities import get_bullet_img
-from entities.entities import player_bullets_group
+from entities.entities import get_bullet_img, enemy_projectile_group, gun_images
+from entities.entities import player_projectile_group
 
 #gun types кортеж(тип пушки, тип пули, скоростельность, задержка, обойма, задержка перезарядки)
 gun_types = {"standard": ("standard", ("standard", 1, 15), True, 10, 15, 50),
              "laser": ("laser", ("laser", 3, 25), False, 0, 5, 70)}
 #bullet types кортеж(тип, урон, скорсть)
 
+all_guns = []
 class Gun():
     def __init__(self, type, user):
+        scale = 0.1
         self.type = type # тип оружия = тип пули
-        #self.image = get_bullet_img(self.type) #картинка пушки
-        #self.rect = self.image.get_rect(topleft=())
+        gun_image = gun_images[self.type[0].split("_")[0]]
+        self.original_image = pygame.transform.scale(gun_image.convert_alpha(), (gun_image.get_size()[0] * scale, gun_image.get_size()[1] * scale))
+        self.image = self.original_image#картинка пушки
+        self.rect = self.image.get_rect(center=user.rect.center)
 
         self.bullet_type = type[1] #кортеж(картинка, тип, урон, скорсть)
         self.rate_of_fire = type[2] #True/False скорострельность (возможность стрелять неотпуская кнопку)
@@ -28,12 +32,23 @@ class Gun():
         self.ammo_delay = 0
         self.can_shot = True
 
+        self.flipped = False
+
         self.user = user
+
+    def update(self):
+        self.rect.center = self.user.rect.center
+        gun_angle = math.degrees(self.user.calc_angle())
+        if gun_angle >= 0 or abs(gun_angle) <= 90:
+            self.image = pygame.transform.rotate(self.original_image, 360 - gun_angle)
+        elif gun_angle < 0:
+            self.image = pygame.transform.flip(pygame.transform.rotate(self.original_image, gun_angle - 360), False, True)
 
     def reload(self): #перезарядка
         keys = pygame.key.get_pressed()
         if self.reload_delay <= 0:
-            if keys[pygame.K_r]:
+            from player.player import player
+            if keys[pygame.K_r] or self.user != player:
                 self.ammo = self.max_ammo
                 self.reload_delay = self.start_reload_delay
         else:
@@ -43,13 +58,16 @@ class Gun():
         keys = pygame.key.get_pressed()
         buttons = pygame.mouse.get_pressed()
         if self.ammo_delay <= 0:
-            if (keys[pygame.K_SPACE] or buttons[0]) and self.reload_delay <= 0 < self.ammo and (self.can_shot or self.rate_of_fire):
-                from player.player import player
-                angle = player.calc_angle()
-                new_bullet = Projectile(self.bullet_type, (player.rect.center[0], player.rect.center[1]),
-                                        (self.bullet_type[2] * math.cos(angle), self.bullet_type[2] * math.sin(angle)),self.user)
+            from player.player import player
+            if (keys[pygame.K_SPACE] or buttons[0] or self.user != player) and self.reload_delay <= 0 < self.ammo and (self.can_shot or self.rate_of_fire):
+                angle = self.user.calc_angle()
+                new_bullet = Projectile(self.bullet_type, (self.user.rect.center[0], self.user.rect.center[1]),
+                                        (self.bullet_type[2] * math.cos(angle), self.bullet_type[2] * math.sin(angle)), self.user)
                 all_projectiles.append(new_bullet)
-                player_bullets_group.add(new_bullet)
+                if self.user == player:
+                    player_projectile_group.add(new_bullet)
+                else:
+                    enemy_projectile_group.add(new_bullet)
                 self.ammo -= 1
                 self.ammo_delay = self.start_ammo_delay
                 self.can_shot = False
@@ -57,6 +75,14 @@ class Gun():
                 self.can_shot = True
         else:
             self.ammo_delay -= 1
+
+    def efire(self):
+        angle = self.user.calc_angle()
+        new_bullet = Projectile(self.bullet_type, (self.user.rect.center[0], self.user.rect.center[1]),
+                                (self.bullet_type[2] * math.cos(angle), self.bullet_type[2] * math.sin(angle)),
+                                self.user)
+        all_projectiles.append(new_bullet)
+        enemy_projectile_group.add(new_bullet)
 
 all_projectiles = [] #список со всеми пулями на карте
 class Projectile(pygame.sprite.Sprite):
@@ -76,7 +102,8 @@ class Projectile(pygame.sprite.Sprite):
 
     def remove(self):
         all_projectiles.remove(self)
-        player_bullets_group.remove(self)
+        player_projectile_group.remove(self)
+        enemy_projectile_group.remove(self)
 
     def is_collide(self, group):
         for sprite in group:

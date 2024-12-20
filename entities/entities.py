@@ -18,10 +18,13 @@ cursor_img = pygame.image.load("images/cursor.png")
 #guns
 
 #bullets
-standard_bullet_image = pygame.image.load("images/guns/bullets/bullet.png")
+#standard_bullet_image = pygame.image.load("images/guns/bullets/bullet.png")
 def get_bullet_img(gun_type):
-    #return pygame.image.load(f"images/guns/bullets/bullet_{gun_type}_test.png" )
-    return standard_bullet_image
+    return pygame.image.load(f"images/guns/bullets/bullet_{gun_type}.png" )
+
+#guns
+gun_images = {"standard": pygame.image.load("images/guns/standard_gun.png"),
+              "laser": pygame.image.load("images/guns/laser_gun.png")}
 
 #enemies
 plus_enemy_stay_image = pygame.image.load("images/enemies/plus_vrug.png")
@@ -32,7 +35,11 @@ half_heat = pygame.image.load("images/UI/half_heart.png").convert_alpha()
 full_heat = pygame.image.load("images/UI/full_heart.png").convert_alpha()
 math_menu_image = pygame.image.load("images/UI/math_menu.png").convert_alpha()
 
+#items
+heal_item_image = pygame.image.load("images/items/heal.png").convert_alpha()
+
 player_group = pygame.sprite.Group()
 enemies_group = pygame.sprite.Group()
-player_bullets_group = pygame.sprite.Group()
-enemy_bullets_group = pygame.sprite.Group()
+player_projectile_group = pygame.sprite.Group()
+enemy_projectile_group = pygame.sprite.Group()
+item_group = pygame.sprite.Group()
