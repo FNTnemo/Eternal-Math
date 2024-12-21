@@ -22,7 +22,6 @@ from entities.tile import collide_tiles, tiles
 
 stop = False
 load_map(m0_1)
-#loaded_map.draw_map()
 
 for element in range(-(int(-get_map_size(loaded_map)[1] // bg1.get_size()[1]))): #background draw
     tiles.add(Background(0, element * 1080, (1920, 1080), bg1))
@@ -67,7 +66,6 @@ while not stop: #main game loop
     cursor.update_pos()
 
     #draw
-    print(len(all_guns))
     draw_queue = [tiles, collide_tiles, item_group, enemy_projectile_group, player_projectile_group, enemies_group, player_group, all_guns, [player.get_selected_gun()]]
     for group in draw_queue:
         for obj in group:
