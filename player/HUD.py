@@ -101,7 +101,7 @@ def update_HUD_elements():
 
     if player.is_win:
         HUD_elements.append(HUD_element("text", hints_font.render("Поздравляем, Вы прошли игру!", True, black), (150, WINDOW_HEIGHT//2.5)))
-        HUD_elements.append(HUD_element("text", hints_font.render("Главный герой проснулся, пошёл на урок математики и,", True, black), (150, WINDOW_HEIGHT // 2.5 + 30)))
+        HUD_elements.append(HUD_element("text", hints_font.render("Главный герой проснулся после крепкого сна, пошёл на урок математики и,", True, black), (150, WINDOW_HEIGHT // 2.5 + 30)))
         HUD_elements.append(HUD_element("text", hints_font.render("используя полученные знания, получил 5.", True, black), (150, WINDOW_HEIGHT // 2.5 + 60)))
 
 
