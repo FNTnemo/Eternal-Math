@@ -3,7 +3,7 @@ import math
 import pygame.sprite
 
 import guns
-from entities.entities import enemies_group, player_stay_img, player_group, plus_enemy_stay_image, \
+from entities.images import enemies_group, player_stay_img, player_group, plus_enemy_stay_image, \
     minus_enemy_stay_image, player_projectile_group
 from entities.tile import collide_tiles
 from guns import all_projectiles, gun_types, all_guns
@@ -18,7 +18,12 @@ enemy_types = {"plus": ["plus", plus_enemy_stay_image, 2, 10],
 scale = 0.15
 
 def spawn_enemy(type_str, pos):
-    return Enemy(enemy_types[type_str], pos)
+    enemy = Enemy(enemy_types[type_str], pos)
+    for wall_block in collide_tiles:
+        if enemy.rect.colliderect(wall_block.rect):
+            enemy.death()
+            return None
+    return enemy
 
 class Enemy(pygame.sprite.Sprite):
     def __init__(self, enemy_type, pos):
@@ -31,13 +36,14 @@ class Enemy(pygame.sprite.Sprite):
         self.type = enemy_type[0]
         self.velocity_length = enemy_type[2]
         self.hp = enemy_type[3]
-        self.damage = 1
 
         self.velocity = pygame.math.Vector2()
         if self.type == "plus":
             self.add_gun("standard")
+            self.damage = 1
         else:
             self.gun = "empty"
+            self.damage = 2
 
         #booleans
         self.is_flip = False
@@ -55,7 +61,7 @@ class Enemy(pygame.sprite.Sprite):
             if self.gun != "empty":
                 if self.in_attack_radius:
                     self.gun.fire()
-                if self.gun.ammo <= 0:
+                if self.gun.ammo <= 0 or self.gun.reload_delay > 0:
                     self.gun.reload()
             if player.rect.colliderect(self.rect):
                 player.get_damage(self.damage)
@@ -90,9 +96,10 @@ class Enemy(pygame.sprite.Sprite):
             return
         else:
             self.in_attack_radius = False
-        if not self.is_collide(collide_tiles):
-            self.rect.x += self.velocity.x
-            self.rect.y += self.velocity.y
+        if r <= 600:
+            if not self.is_collide(collide_tiles):
+                self.rect.x += self.velocity.x
+                self.rect.y += self.velocity.y
 
     def get_damage(self, damage):
         self.hp -= damage

@@ -1,10 +1,10 @@
 import math
 import pygame
+from past.builtins import reload
 
 from entities.tile import collide_tiles
-from player.camera import camera
-from entities.entities import get_bullet_img, enemy_projectile_group, gun_images
-from entities.entities import player_projectile_group
+from entities.images import get_bullet_img, enemy_projectile_group, gun_images
+from entities.images import player_projectile_group
 
 #gun types кортеж(тип пушки, тип пули, скоростельность, задержка, обойма, задержка перезарядки)
 gun_types = {"standard": ("standard", ("standard", 1, 15), True, 10, 15, 50),
@@ -48,8 +48,9 @@ class Gun():
         keys = pygame.key.get_pressed()
         if self.reload_delay <= 0:
             from player.player import player
-            if keys[pygame.K_r] or self.user != player:
+            if self.user != player or keys[pygame.K_r]:
                 self.ammo = self.max_ammo
+
                 self.reload_delay = self.start_reload_delay
         else:
             self.reload_delay -= 1
@@ -127,5 +128,6 @@ class Projectile(pygame.sprite.Sprite):
         return self.type
 
 def draw_bullets(screen): #отрисовка пуль
+    from player.camera import camera
     for bullet in all_projectiles:
         pygame.draw.circle(screen, "red", (bullet.rect.x - camera.offset.x, bullet.rect.y - camera.offset.y), 10)

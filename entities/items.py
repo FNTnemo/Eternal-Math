@@ -1,9 +1,10 @@
 import pygame.sprite
 
-from entities.entities import item_group, heal_item_image
+from entities.images import item_group, heal_item_image, win_cup_image
 
 #название, каринка, свойства
-item_types = {"heal": ["heal", heal_item_image, 1]}
+item_types = {"heal": ["heal", heal_item_image, 1],
+              "cup": ["cup", win_cup_image]}
 
 class Item(pygame.sprite.Sprite):
     def __init__(self, pos, type, scale):
@@ -25,6 +26,8 @@ class Item(pygame.sprite.Sprite):
                 if player.hp < player.max_hp:
                     player.hp += self.heal
                     item_group.remove(self)
+            if self.type == "cup":
+                player.win()
 
     def is_collide(self, obj):
         if self.rect.colliderect(obj.rect):

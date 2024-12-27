@@ -1,4 +1,6 @@
 import pygame
+from pygame import K_ESCAPE
+
 from settings import *
 
 pygame.init() #инициализация
@@ -13,60 +15,27 @@ from guns import all_projectiles, all_guns
 from entities.enemy import spawn_enemy
 from player.player import player
 from player.camera import camera
-from map import Background, load_map, loaded_map, m0_0, m0_1, get_map_size
+from map import Background, load_map, loaded_map, m0_0, m0_1, get_map_size, map_queue, map_index
 from player.HUD import cursor, debug_font, debug_elements, update_debug_el, HUD_elements, \
     update_HUD_elements
-from entities.entities import bg1, enemy_projectile_group, player_projectile_group, enemies_group, player_group, \
+from entities.images import bg1, enemy_projectile_group, player_projectile_group, enemies_group, player_group, \
     item_group
-from entities.tile import collide_tiles, tiles
+from entities.tile import collide_tiles, back_tiles, tiles
 
 stop = False
-load_map(m0_1)
+intro = True
+
+load_map(map_queue[map_index])
 
 for element in range(-(int(-get_map_size(loaded_map)[1] // bg1.get_size()[1]))): #background draw
-    tiles.add(Background(0, element * 1080, (1920, 1080), bg1))
+    back_tiles.add(Background(0, element * 1080, (1920, 1080), bg1))
 
 player.add_gun("standard") #player guns
 player.add_gun("laser")
 
-spawn_enemy("plus", (100, 400)) #enemy spawn
-spawn_enemy("minus", (700, 200))
-
-
-while not stop: #main game loop
-    scr.fill((0, 0, 0))  # screen fill
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            stop = True  # game ending
-
-    fps = clock.get_fps()
-    #player
-    player.update()
-    camera.center_box_camera(player)
-    #player.player_angle_debug_draw(scr)
-    #camera.camera_shake(10, 10)
-
-    if player.alive:
-        #enemy
-        for enemy in enemies_group:
-            enemy.update()
-
-        #guns
-        for gun in all_guns:
-            gun.update()
-        player.get_selected_gun().update()
-
-        #bullets movement
-        for projectile in all_projectiles:
-            projectile.movement()
-
-        #item
-        for item in item_group:
-            item.update()
-    cursor.update_pos()
-
+def rander():
     #draw
-    draw_queue = [tiles, collide_tiles, item_group, enemy_projectile_group, player_projectile_group, enemies_group, player_group, all_guns, [player.get_selected_gun()]]
+    draw_queue = [back_tiles, collide_tiles, tiles, item_group, enemy_projectile_group, player_projectile_group, enemies_group, player_group, all_guns, [player.get_selected_gun()]]
     for group in draw_queue:
         for obj in group:
             scr.blit(obj.image, (obj.rect.x - camera.offset.x, obj.rect.y - camera.offset.y))
@@ -77,20 +46,63 @@ while not stop: #main game loop
     x0 = 5
     y0 = WINDOW_HEIGHT - 18
     update_HUD_elements()
-    update_debug_el()
-    if fps >= 60:
-        debug_elements.append(debug_font.render("FPS: " + str(fps), True, green))
-    elif fps >= 30:
-        debug_elements.append(debug_font.render("FPS: " + str(fps), True, yellow))
-    else:
-        debug_elements.append(debug_font.render("FPS: " + str(fps), True, red))
 
     for element in range(len(debug_elements)):
         scr.blit(debug_elements[element], (x0, y0 - element * 14))
     for element in HUD_elements:
-        scr.blit(element.image, (element.rect.x, element.rect.y))
-    debug_elements.clear()
+        if element.type == "image":
+            scr.blit(element.image, (element.rect.x, element.rect.y))
+        if element.type == "text":
+            scr.blit(element.text, element.position)
+
     HUD_elements.clear()
+
+    #update_debug_el()
+    #if fps >= 60:
+    #    debug_elements.append(debug_font.render("FPS: " + str(fps), True, green))
+    #elif fps >= 30:
+    #    debug_elements.append(debug_font.render("FPS: " + str(fps), True, yellow))
+    #else:
+    #    debug_elements.append(debug_font.render("FPS: " + str(fps), True, red))
+    # debug_elements.clear()
+
+def update():
+    player.update() #player
+    camera.center_box_camera(player)
+    cursor.update_pos()
+
+    for tile in tiles:
+        tile.update()
+
+    if player.alive:
+        for enemy in enemies_group:
+            enemy.update() #enemy
+
+        for gun in all_guns:
+            gun.update() #guns
+        player.get_selected_gun().update()
+
+        for projectile in all_projectiles:
+            projectile.movement() #bullets
+
+        for item in item_group:
+            item.update() #item
+
+def restart_game():
+    pass
+
+while not stop: #main game loop
+    scr.fill((0, 0, 0))  # screen fill
+    keys = pygame.key.get_pressed()
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT or (keys[K_ESCAPE] and player.is_win):
+            stop = True  # game ending
+    fps = clock.get_fps()
+    ##
+
+    ##
+    update()
+    rander()
 
     clock.tick(TPS)  #ticks per second
     pygame.display.flip()

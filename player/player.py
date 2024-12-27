@@ -2,12 +2,15 @@ import math
 import pygame
 
 import guns
-from entities.tile import collide_tiles
-from guns import gun_types
+from entities.tile import collide_tiles, tiles
+from guns import gun_types, all_projectiles, all_guns
+from map import load_map, map_queue, to_next_level
+from map import map_index
 from player.camera import camera
 from settings import *
-from entities.entities import player_stay_img, player_walking_images, enemy_projectile_group
-from entities.entities import player_group
+from entities.images import player_stay_img, player_walking_images, enemy_projectile_group, enemies_group, item_group, \
+    player_projectile_group
+from entities.images import player_group
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, hp, pos0, scale, velocity, group):
@@ -21,6 +24,7 @@ class Player(pygame.sprite.Sprite):
         self.scale = scale
 
         #walking
+        self.pos0 = pos0
         self.direction = pygame.math.Vector2()
         self.last_direction = pygame.math.Vector2()
         self.velocity = velocity #скорость игока
@@ -53,6 +57,7 @@ class Player(pygame.sprite.Sprite):
         #booleans
         self.is_flip = False
         self.math_menu = False
+        self.is_win = False
 
     def update(self):
         if self.alive:
@@ -64,6 +69,11 @@ class Player(pygame.sprite.Sprite):
             for projectile in enemy_projectile_group:
                 if projectile.rect.colliderect(self.rect):
                     self.get_damage(projectile.damage)
+
+            for tile in tiles: #при заходе в портал
+                if self.rect.colliderect(tile.rect) and tile.type == "portal" and tile.activated:
+                    to_next_level()
+
         if self.hp <= 0:
             self.remove(player_group)
             self.alive = False
@@ -103,6 +113,18 @@ class Player(pygame.sprite.Sprite):
         if self.dash_delay <= 0:
             if keys[pygame.K_LSHIFT]: self.dash()
         else: self.dash_delay -= 1
+
+    def win(self):
+        self.alive = False
+        for e in enemies_group:
+            e.remove(enemies_group)
+        for ep in enemy_projectile_group:
+            ep.remove(enemy_projectile_group)
+        for pp in player_projectile_group:
+            pp.remove(player_projectile_group)
+        all_projectiles.clear()
+        self.is_win = True
+        self.hp = 0
 
     def dash(self):
         self.rect.x += self.velocity * self.direction.x * 10
@@ -160,7 +182,7 @@ class Player(pygame.sprite.Sprite):
     def player_angle_debug_draw(self, screen): #отрисовка игрока
         pygame.draw.line(screen, green, (self.rect.center[0] - camera.offset.x, self.rect.center[1] - camera.offset.y), (pygame.mouse.get_pos()), 1) #линия от игрока до мышки
 
-    def get_selected_gun(self): #функция, которая возвращает пушку, которая в руках
+    def get_selected_gun(self): # функция, которая возвращает пушку, которая в руках
         if self.selected_gun_index > -1:
             return self.guns[self.selected_gun_index]
 
