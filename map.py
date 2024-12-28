@@ -6,9 +6,8 @@ import pygame.draw
 from entities.items import Item, item_types
 from guns import all_projectiles
 from settings import *
-from entities.images import wall_tile_test, stone_wall_images, item_group, enemies_group, enemy_projectile_group, \
-    player_projectile_group
-from entities.tile import collide_tiles, Tile, back_tiles, clear_tiles, tiles
+from entities.images import item_group, enemies_group, enemy_projectile_group, player_projectile_group
+from entities.tile import collide_tiles, Tile, tiles
 
 class Background(pygame.sprite.Sprite):
     def __init__(self, x, y, size, img):
@@ -242,9 +241,9 @@ def load_map(mapi):
         item.remove(item_group)
     # очистка пуль
     for projectile in enemy_projectile_group:
-        projectile.remove()
+        projectile.remove(enemy_projectile_group)
     for projectile in player_projectile_group:
-        projectile.remove()
+        projectile.remove(player_projectile_group)
     all_projectiles.clear()
     # очистка карты
     for i in collide_tiles:

@@ -3,11 +3,10 @@ import math
 import pygame.sprite
 
 import guns
-from entities.images import enemies_group, player_stay_img, player_group, plus_enemy_stay_image, \
+from entities.images import enemies_group, plus_enemy_stay_image, \
     minus_enemy_stay_image, player_projectile_group
 from entities.tile import collide_tiles
-from guns import all_projectiles, gun_types, all_guns
-from map import get_map_cell
+from guns import gun_types, all_guns
 from player.camera import camera
 from player.player import player
 

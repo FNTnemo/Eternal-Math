@@ -12,12 +12,10 @@ pygame.display.set_icon(pygame.image.load("images/UI/LOGO.ico"))
 pygame.mouse.set_visible(False)
 
 from guns import all_projectiles, all_guns
-from entities.enemy import spawn_enemy
 from player.player import player
 from player.camera import camera
-from map import Background, load_map, loaded_map, m0_0, m0_1, get_map_size, map_queue, map_index
-from player.HUD import cursor, debug_font, debug_elements, update_debug_el, HUD_elements, \
-    update_HUD_elements
+from map import Background, load_map, loaded_map, get_map_size, map_queue, map_index
+from player.HUD import cursor, debug_elements, HUD_elements, update_HUD_elements
 from entities.images import bg1, enemy_projectile_group, player_projectile_group, enemies_group, player_group, \
     item_group
 from entities.tile import collide_tiles, back_tiles, tiles

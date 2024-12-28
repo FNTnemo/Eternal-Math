@@ -1,6 +1,5 @@
 import math
 import pygame
-from past.builtins import reload
 
 from entities.tile import collide_tiles
 from entities.images import get_bullet_img, enemy_projectile_group, gun_images

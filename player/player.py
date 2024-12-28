@@ -3,9 +3,8 @@ import pygame
 
 import guns
 from entities.tile import collide_tiles, tiles
-from guns import gun_types, all_projectiles, all_guns
-from map import load_map, map_queue, to_next_level
-from map import map_index
+from guns import gun_types, all_projectiles
+from map import to_next_level
 from player.camera import camera
 from settings import *
 from entities.images import player_stay_img, player_walking_images, enemy_projectile_group, enemies_group, item_group, \

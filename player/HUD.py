@@ -1,13 +1,11 @@
-import time
-
 import pygame
 
 import guns
 from map import get_map_index
 from player.player import player
 from settings import *
-from entities.images import player_group, player_projectile_group, enemy_projectile_group, enemies_group, cursor_img, half_heat, full_heat, math_menu_image, intro_images, bullet_indicator_image
-from entities.tile import back_tiles, collide_tiles, Tile
+from entities.images import player_group, player_projectile_group, enemy_projectile_group, enemies_group, cursor_img, half_heat, full_heat, math_menu_image, bullet_indicator_image
+from entities.tile import back_tiles, collide_tiles
 
 #hints boolean
 W_pressed = False

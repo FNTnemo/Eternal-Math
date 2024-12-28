@@ -1,6 +1,6 @@
 import pygame.display
 
-from map import loaded_map, get_map_size, get_loaded_map
+from map import get_map_size, get_loaded_map
 from settings import *
 
 
