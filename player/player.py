@@ -41,7 +41,7 @@ class Player(pygame.sprite.Sprite):
         self.max_hp = hp
         self.hp = self.max_hp
         self.alive = True
-        self.hp_cooldown_start = 90
+        self.hp_cooldown_start = 60
         self.hp_cooldown = self.hp_cooldown_start
 
         #anim

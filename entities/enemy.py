@@ -12,7 +12,7 @@ from player.player import player
 
 # тип, скорость, хп, пушка
 enemy_types = {"plus": ["plus", plus_enemy_stay_image, 2, 10],
-               "minus": ["minus", minus_enemy_stay_image, 4, 6]}
+               "minus": ["minus", minus_enemy_stay_image, 4.7, 6]}
 
 scale = 0.15
 
@@ -30,7 +30,7 @@ class Enemy(pygame.sprite.Sprite):
         source_image = enemy_type[1].convert_alpha()
         w, h = source_image.get_size()
         self.image = pygame.transform.scale(source_image, (w * scale, h * scale))
-        self.rect = self.image.get_rect(topleft=(pos[0], pos[1]))
+        self.rect = self.image.get_rect(midbottom=(pos[0], pos[1]))
 
         self.type = enemy_type[0]
         self.velocity_length = enemy_type[2]
