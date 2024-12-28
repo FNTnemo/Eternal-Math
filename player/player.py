@@ -118,9 +118,9 @@ class Player(pygame.sprite.Sprite):
         for e in enemies_group:
             e.remove(enemies_group)
         for ep in enemy_projectile_group:
-            ep.remove(enemy_projectile_group)
+            ep.remove()
         for pp in player_projectile_group:
-            pp.remove(player_projectile_group)
+            pp.remove()
         all_projectiles.clear()
         self.is_win = True
         self.hp = 0
